@@ -19,19 +19,38 @@ class LibraryItem:
         self._requested_by = None
         self._date_checked_out = None
 
-  
-
 class Book(LibraryItem):
     def __init__(self, library_item_id, title, author):
         super().__init__(library_item_id, title)
         self._author = author
 
-    
+    def get_author(self):
+        return self._author
 
     def get_check_out_length(self):
         return 21
 
+class Album(LibraryItem):
+    def __init__(self, library_item_id, title, artist):
+        super().__init__(library_item_id, title)
+        self._artist = artist
 
+    def get_artist(self):
+        return self._artist
+
+    def get_check_out_length(self):
+        return 14
+
+class Movie(LibraryItem):
+    def __init__(self, library_item_id, title, director):
+        super().__init__(library_item_id, title)
+        self._director = director
+
+    def get_director(self):
+        return self._director
+
+    def get_check_out_length(self):
+        return 7
 
 class Patron:
     def __init__(self, patron_id, name):
@@ -40,19 +59,12 @@ class Patron:
         self._checked_out_items = []
         self._fine_amount = 0.0
 
-    
-
 class Library:
     def __init__(self):
         self._holdings = {}
         self._members = {}
         self._current_date = 0
 
-    
-
-    
-
-# Example use of the classes 
 def main():
     b1 = Book("345", "Phantom Tollbooth", "Juster")
     a1 = Album("456", "...And His Orchestra", "The Fastbacks")
@@ -67,8 +79,6 @@ def main():
     lib.add_library_item(m1)
     lib.add_patron(p1)
     lib.add_patron(p2)
-
-    
 
 if __name__ == "__main__":
     main()
