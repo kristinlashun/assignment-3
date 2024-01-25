@@ -24,9 +24,6 @@ class Book(LibraryItem):
         super().__init__(library_item_id, title)
         self._author = author
 
-    def get_author(self):
-        return self._author
-
     def get_check_out_length(self):
         return 21
 
@@ -35,9 +32,6 @@ class Album(LibraryItem):
         super().__init__(library_item_id, title)
         self._artist = artist
 
-    def get_artist(self):
-        return self._artist
-
     def get_check_out_length(self):
         return 14
 
@@ -45,9 +39,6 @@ class Movie(LibraryItem):
     def __init__(self, library_item_id, title, director):
         super().__init__(library_item_id, title)
         self._director = director
-
-    def get_director(self):
-        return self._director
 
     def get_check_out_length(self):
         return 7
@@ -59,26 +50,62 @@ class Patron:
         self._checked_out_items = []
         self._fine_amount = 0.0
 
+    def amend_fine(self, amount):
+        self._fine_amount += amount
+        if self._fine_amount < 0:
+            self._fine_amount = 0  
+
 class Library:
     def __init__(self):
         self._holdings = {}
         self._members = {}
         self._current_date = 0
 
+    def add_library_item(self, item):
+        self._holdings[item._library_item_id] = item
+
+    def add_patron(self, patron):
+        self._members[patron._patron_id] = patron
+
+    def increment_current_date(self):
+        self._current_date += 1
+        # Update fines for overdue items for each patron
+        for patron_id, patron in self._members.items():
+            for item_id in patron._checked_out_items:
+                item = self._holdings[item_id]
+                if self._current_date - item._date_checked_out > item.get_check_out_length():
+                    patron.amend_fine(0.10)  # Assuming 10 cents fine per day overdue
+
+    def pay_fine(self, patron_id, amount):
+        patron = self._members.get(patron_id)
+        if patron:
+            patron.amend_fine(-amount)  # Negative amount to reduce the fine
+            return "payment successful"
+        else:
+            return "patron not found"
+
 def main():
-    b1 = Book("345", "Phantom Tollbooth", "Juster")
-    a1 = Album("456", "...And His Orchestra", "The Fastbacks")
-    m1 = Movie("567", "Laputa", "Miyazaki")
+    # Create two books
+    book1 = Book("001", "Book One", "Author A")
+    book2 = Book("002", "Book Two", "Author B")
 
-    p1 = Patron("abc", "Felicity")
-    p2 = Patron("bcd", "Waldo")
+    # Create two patrons
+    patron1 = Patron("p001", "Patron One")
+    patron2 = Patron("p002", "Patron Two")
 
-    lib = Library()
-    lib.add_library_item(b1)
-    lib.add_library_item(a1)
-    lib.add_library_item(m1)
-    lib.add_patron(p1)
-    lib.add_patron(p2)
+    # Create a library and add books and patrons
+    library = Library()
+    library.add_library_item(book1)
+    library.add_library_item(book2)
+    library.add_patron(patron1)
+    library.add_patron(patron2)
+
+    # Increment the date, have patron pay fine, check fine amount
+    library.increment_current_date()  # This would also need to mark books as overdue and apply fines if needed
+    print(patron1._fine_amount)  # Check fine amount before payment
+    library.pay_fine("p001", 0.30)  # Patron pays 30 cents fine
+    print(patron1._fine_amount)  # Check fine amount after payment
 
 if __name__ == "__main__":
     main()
+
