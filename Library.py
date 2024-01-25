@@ -10,8 +10,6 @@ The Library class manages the operations, including adding items and patrons, ch
 processing payments, and updating fines.
 """
 
-# Library.py
-
 class LibraryItem:
     def __init__(self, library_item_id, title):
         self._library_item_id = library_item_id
